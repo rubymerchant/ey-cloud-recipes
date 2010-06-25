@@ -111,7 +111,6 @@ if ['solo', 'app', 'app_master'].include?(node[:instance_role])
         day     '*'
         month   '*'
         weekday '*'
-        command "cd /data/#{app_name}/current && RAILS_ENV=#{node[:environment][:framework_env]} rake #{flavor}:index"
         command "lockrun --lockfile=/tmp/#{app_name}-sphinx.lockrun -- indexer --rotate --config /data/#{app_name}/shared/config/sphinx.conf #{delta_indexes} >> /var/log/engineyard/sphinx/#{app_name}/searchd.log"
         user node[:owner_name]
       end
@@ -125,7 +124,7 @@ if ['solo', 'app', 'app_master'].include?(node[:instance_role])
         day     '*'
         month   '*'
         weekday '*'
-        command "cd /data/#{app_name}/current && RAILS_ENV=#{node[:environment][:framework_env]} rake #{flavor}:index"
+        command "lockrun --wait --lockfile=/tmp/#{app_name}-sphinx.lockrun -- cd /data/#{app_name}/current && RAILS_ENV=#{node[:environment][:framework_env]} rake #{flavor}:index"
         user node[:owner_name]
       end
     end
