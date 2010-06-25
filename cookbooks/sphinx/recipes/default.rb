@@ -77,6 +77,11 @@ if ['solo', 'app', 'app_master'].include?(node[:instance_role])
       })
     end
 
+    execute "symlink sphinx yml" do
+      command "ln -nfs /data/#{app_name}/shared/config/sphinx.yml /data/#{app_name}/current/config/sphinx.yml"
+      user node[:owner_name]
+    end
+
     execute "sphinx config" do
       command "rake #{flavor}:configure"
       user node[:owner_name]
