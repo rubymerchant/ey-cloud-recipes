@@ -4,10 +4,10 @@
 #
 
 # Set your application name here
-appname = "appname"
+appname = "theauteurscom2"
 
 # Uncomment the flavor of sphinx you want to use
-#flavor = "thinking_sphinx"
+flavor = "thinking_sphinx"
 #flavor = "ultrasphinx"
 
 # If you want to have scheduled reindexes in cron, enter the minute
@@ -17,7 +17,9 @@ appname = "appname"
 # If you don't want scheduled reindexes, just leave this commented.
 #
 # Uncommenting this line as-is will reindex once every 10 minutes.
-# cron_interval = 10
+cron_interval = 60
+delta_cron_interval = 1
+delta_indexes = "film_delta staged_film_delta"
 
 if ['solo', 'app', 'app_master'].include?(node[:instance_role])
 
@@ -101,6 +103,20 @@ if ['solo', 'app', 'app_master'].include?(node[:instance_role])
 
     execute "monit quit"
 
+    if delta_cron_interval
+      cron "sphinx delta index" do
+        action  :create
+        minute  "*/#{delta_cron_interval}"
+        hour    '*'
+        day     '*'
+        month   '*'
+        weekday '*'
+        command "cd /data/#{app_name}/current && RAILS_ENV=#{node[:environment][:framework_env]} rake #{flavor}:index"
+        command "lockrun --lockfile=/tmp/#{app_name}-sphinx.lockrun -- indexer --rotate --config /data/#{app_name}/shared/config/sphinx.conf #{delta_indexes} >> /var/log/engineyard/sphinx/#{app_name}/searchd.log"
+        user node[:owner_name]
+      end
+    end
+
     if cron_interval
       cron "sphinx index" do
         action  :create
@@ -113,7 +129,6 @@ if ['solo', 'app', 'app_master'].include?(node[:instance_role])
         user node[:owner_name]
       end
     end
-
   end
 
 end
