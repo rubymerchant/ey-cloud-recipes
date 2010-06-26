@@ -77,6 +77,18 @@ if ['solo', 'app', 'app_master'].include?(node[:instance_role])
       })
     end
 
+    directory "/data/#{app_name}/shared/config/thinkingsphinx" do
+      recursive true
+      owner node[:owner_name]
+      group node[:owner_name]
+      mode 0755
+    end
+
+    execute "symlink thinking sphinx config dir" do
+      command "ln -nfs /data/#{app_name}/shared/config/thinkingsphinx /data/#{app_name}/current/config/thinkingsphinx"
+      user node[:owner_name]
+    end
+
     execute "symlink sphinx yml" do
       command "ln -nfs /data/#{app_name}/shared/config/sphinx.yml /data/#{app_name}/current/config/sphinx.yml"
       user node[:owner_name]
