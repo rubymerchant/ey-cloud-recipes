@@ -20,6 +20,9 @@ flavor = "thinking_sphinx"
 cron_interval = 60
 delta_cron_interval = 1
 delta_indexes = "film_delta staged_film_delta"
+config_file = "/data/#{appname}/current/config/#{flavor}/#{node[:environment][:framework_env]}.sphinx.conf"
+
+
 
 if ['solo', 'app', 'app_master'].include?(node[:instance_role])
 
@@ -128,7 +131,7 @@ if ['solo', 'app', 'app_master'].include?(node[:instance_role])
         day     '*'
         month   '*'
         weekday '*'
-        command "lockrun --lockfile=/tmp/#{app_name}-sphinx.lockrun -- indexer --rotate --config /data/#{app_name}/shared/config/sphinx.conf #{delta_indexes} >> /var/log/engineyard/sphinx/#{app_name}/searchd.log"
+        command "lockrun --lockfile=/tmp/#{app_name}-sphinx.lockrun -- indexer --rotate --config #{config_file} #{delta_indexes} >> /var/log/engineyard/sphinx/#{app_name}/searchd.log"
         user node[:owner_name]
       end
     end
