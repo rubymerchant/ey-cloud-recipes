@@ -1,0 +1,7 @@
+check process <%= @worker_name %>
+  with pidfile /data/<%= @app_name %>/shared/pids/dj.pid
+  start program = "/engineyard/bin/dj <%= @app_name %> start <%= @framework_env %>"
+  stop program = "/engineyard/bin/dj <%= @app_name %> stop <%= @framework_env %>"
+  if totalmem is greater than 200 MB for 2 cycles then restart # eating up memory?
+  alert errors@theauteurs.com on { resource }
+  group <%= @worker_name %>
